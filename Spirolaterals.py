@@ -1,4 +1,3 @@
-import sys
 from tkinter import *
 
 class Spirolateral():
@@ -106,7 +105,7 @@ def Quit():
     button3.grid(row = 2, sticky = N)
     button4.grid(row = 2, sticky = W)
 
-functionList = [spiro_add, spiro_remove, save, load, Quit]
+function_list = [spiro_add, spiro_remove, save, load, Quit]
 
 def check_num(entry, label, response, lower_limit, upper_limit, integer):
     try:
@@ -143,7 +142,7 @@ def menu():
     x = 1
     for option in options:
         x += 1
-        buttonx = Button(root, text = option, command = functionList[x-2])
+        buttonx = Button(root, text = option, command = function_list[x-2])
         buttonx.grid(row = x, sticky = W)
 
     spiro_print()
