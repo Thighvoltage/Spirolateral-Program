@@ -24,7 +24,7 @@ MIN_CHOICE = 1
 
 def spiro_add():
     if len(spiros) == MAX_SPIRO:
-       label3.configure(text = "You can only lend funds to up to {} people at once.".format(MAX_SPIRO))
+       label3.configure(text = "You can only add {} spirolaterals.".format(MAX_SPIRO))
     else:
         clear()
 
