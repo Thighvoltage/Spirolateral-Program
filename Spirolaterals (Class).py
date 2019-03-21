@@ -79,6 +79,10 @@ class GUI:
         self.label_spiro.grid(row = 0, column = 0, padx = PAD_LX,
                               pady = PAD_LY, sticky = NW)
 
+        self.label_spiros = Label(self.frame_spiro)
+        self.label_spiros.grid(row = 1, column = 0, padx = PAD_LX,
+                               sticky = NW)
+
     def spiro_add(self):
         if len(spiros) == MAX_SPIRO:
            label3.configure(text = "You can only have {} spirolaterals."
@@ -129,6 +133,8 @@ class GUI:
         if name != "" and segment != -1 and angle != -1:
             spiros.append(Spirolateral(name, segment, angle))
 
+        self.spiro_print()
+
     def spiro_remove(self):
         self.label_prompt1.configure(text = "Integer:")
 
@@ -155,6 +161,14 @@ class GUI:
     def quit(self):
         print(6)
 
+    def spiro_print(self):
+        self.label_spiros.configure(text = "")
+        for index in range(len(spiros)):
+            self.label_spiros.configure(text = "{}) {} - {} segments and {}°"
+                                        .format(index + 1, spiros[index].name,
+                                        spiros[index].segment,
+                                        spiros[index].angle))
+
 def check_num(entry, label, response, lower_limit, upper_limit, integer):
     try:
         choice = integer(entry.get())
@@ -169,9 +183,6 @@ def check_num(entry, label, response, lower_limit, upper_limit, integer):
         elif integer == float:
             label.configure(text = "Not a valid number.")
         return -1
-
-def spiro_print():
-    print(5)
 
 spiros = []
 MAX_SPIRO = 10
