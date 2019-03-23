@@ -1,4 +1,6 @@
 from tkinter import *
+import turtle
+import pickle
 
 class Spirolateral():
     def __init__(self, name, segment, angle):
@@ -79,34 +81,36 @@ class GUI:
         self.label_spiro.grid(row = 0, column = 0, padx = PAD_LX,
                               pady = PAD_LY, sticky = NW)
 
-        self.label_spiros = Label(self.frame_spiro)
+        self.label_spiros = Label(self.frame_spiro, justify = LEFT)
         self.label_spiros.grid(row = 1, column = 0, padx = PAD_LX,
                                sticky = NW)
 
     def spiro_add(self):
+        self.clear()
         if len(spiros) == MAX_SPIRO:
-           label3.configure(text = "You can only have {} spirolaterals."
-                            .format(MAX_SPIRO))
+            self.label_prompt1.configure(text = "You can only have {}"
+                                        + "spirolaterals.".format(MAX_SPIRO))
+            self.label_prompt1.grid(row = 0, column = 0)
         else:
             self.label_prompt1.configure(text = "Name:")
             self.label_prompt2.configure(text = "Segments:")
             self.label_prompt3.configure(text = "Angle:")
 
-            self.label_prompt1.grid(row = 1, column = 0, sticky = W)
-            self.label_prompt2.grid(row = 2, column = 0, sticky = W)
-            self.label_prompt3.grid(row = 3, column = 0, sticky = W)
+            self.label_prompt1.grid(row = 0, column = 0, sticky = W)
+            self.label_prompt2.grid(row = 1, column = 0, sticky = W)
+            self.label_prompt3.grid(row = 2, column = 0, sticky = W)
 
-            self.label_response1.grid(row = 1, column = 2, sticky = W)
-            self.label_response2.grid(row = 2, column = 2, sticky = W)
-            self.label_response3.grid(row = 3, column = 2, sticky = W)
+            self.label_response1.grid(row = 0, column = 2, sticky = W)
+            self.label_response2.grid(row = 1, column = 2, sticky = W)
+            self.label_response3.grid(row = 2, column = 2, sticky = W)
 
-            self.entry1.grid(row = 1, column = 1)
-            self.entry2.grid(row = 2, column = 1)
-            self.entry3.grid(row = 3, column = 1)
+            self.entry1.grid(row = 0, column = 1)
+            self.entry2.grid(row = 1, column = 1)
+            self.entry3.grid(row = 2, column = 1)
 
             self.button_enter.configure(command = self.check_add)
 
-            self.button_enter.grid(row = 6, column = 0, sticky = W)
+            self.button_enter.grid(row = 3, column = 0, sticky = W)
 
             self.entry1.delete(0, END)
             self.entry2.delete(0, END)
@@ -119,8 +123,9 @@ class GUI:
 
         for index in range(len(spiros)):
             if name == spiros[index].name:
-                label2.configure(text = "There's already a spirolateral called"
-                                 + "{}.".format(name))
+                self.label_response1.configure(text = "There's already a "
+                                               + "spirolateral called {}."
+                                               .format(name))
                 name = ""
 
         segment = check_num(self.entry2, self.label_response2,
@@ -133,41 +138,87 @@ class GUI:
         if name != "" and segment != -1 and angle != -1:
             spiros.append(Spirolateral(name, segment, angle))
 
-        self.spiro_print()
+            self.spiro_print()
+            self.clear()
+
+            self.label_prompt1.configure(text = "Spirolateral added.")
+            self.label_prompt1.grid(row = 0, column = 0)
 
     def spiro_remove(self):
-        self.label_prompt1.configure(text = "Integer:")
+        self.clear()
+        if len(spiros) == 0:
+            self.label_prompt1.configure(text = "There are no spirolaterals to"
+                                         + " remove.")
+            self.label_prompt1.grid(row = 0, column = 0)
 
-        self.label_prompt1.grid(row = 1, column = 0, sticky = W)
+        else:
+            self.label_prompt1.configure(text = "Integer:")
+            self.label_prompt1.grid(row = 0, column = 0, sticky = W)
 
-        self.entry1.grid(row = 1, column = 1)
+            self.entry1.grid(row = 0, column = 1)
 
-        self.button_enter.configure(command = self.check_remove)
+            self.button_enter.configure(command = self.check_remove)
+            self.button_enter.grid(row = 1, column = 0, sticky = W)
 
     def check_remove(self):
-        choice = check_num("That integer doesn't correspond to anything.")
+        choice = check_num(self.entry1, self.label_prompt1, "That integer "
+                           + "doesn't correspond to anything.", MIN_CHOICE,
+                           len(spiros), int)
         if choice != -1:
             del spiros[choice - 1]
+
+            self.spiro_print()
+            self.clear()
+
+            self.label_prompt1.configure(text = "Spirolateral removed.")
+            self.label_prompt1.grid(row = 0, column = 0)
 
     def spiro_draw(self):
         print(3)
 
     def save(self):
-        print(4)
+        self.clear()
+        if len(spiros) == 0:
+            self.label_prompt1.configure(text = "There are no spirolaterals to"
+                                         + " save.")
+            self.label_prompt1.grid(row = 0, column = 0)
+        else:
+            pickle_out = open("Spirolateral Program Save File","wb")
+            pickle.dump(spiros, pickle_out)
+            pickle_out.close()
+
+            self.label_prompt1.configure(text = "Saved.")
+            self.label_prompt1.grid(row = 0, column = 0)
 
     def load(self):
-        print(5)
+        global spiros
+
+        self.clear()
+        pickle_in = open("Spirolateral Program Save File","rb")
+        spiros = pickle.load(pickle_in)
+        self.spiro_print()
+
+        self.label_prompt1.configure(text = "Loaded.")
+        self.label_prompt1.grid(row = 0, column = 0)
 
     def quit(self):
         print(6)
 
     def spiro_print(self):
-        self.label_spiros.configure(text = "")
+        text = ""
         for index in range(len(spiros)):
-            self.label_spiros.configure(text = "{}) {} - {} segments and {}°"
-                                        .format(index + 1, spiros[index].name,
-                                        spiros[index].segment,
-                                        spiros[index].angle))
+            text += "{}) {} - {} segments and {}°\n".format(index + 1,
+                    spiros[index].name, spiros[index].segment,
+                    spiros[index].angle)
+        self.label_spiros.configure(text = text)
+
+    def clear(self):
+        for widget in self.frame_secondary.winfo_children():
+            widget.grid_forget()
+
+        self.entry1.delete(0, END)
+        self.entry2.delete(0, END)
+        self.entry3.delete(0, END)
 
 def check_num(entry, label, response, lower_limit, upper_limit, integer):
     try:
