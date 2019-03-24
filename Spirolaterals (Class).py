@@ -165,6 +165,8 @@ class GUI:
             self.label_prompt1.configure(text = "Integer:")
             self.label_prompt1.grid(row = 0, column = 0, sticky = W)
 
+            self.label_response1.grid(row = 0, column = 2)
+
             self.entry1.grid(row = 0, column = 1)
 
             self.button_enter.configure(command = self.check_remove)
