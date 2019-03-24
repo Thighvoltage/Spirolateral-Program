@@ -18,6 +18,7 @@ class GUI:
         PAD_LY = 10
         PAD_BX = 3
         PAD_BY = 3
+        WIDTH = 10
 
         self.master = master
         self.frame_menu = Frame(master, bg = COLOUR_BG)
@@ -57,6 +58,11 @@ class GUI:
         self.frame_secondary = Frame(master)
         self.frame_secondary.grid(row = 1, column = 1, sticky = NW)
 
+        # Remove free space between the list of spirolaterals
+        # and the secondary frame
+        # https://stackoverflow.com/a/26908319
+        self.master.grid_columnconfigure(1, weight=1)
+
         self.label_prompt1 = Label(self.frame_secondary, pady = PAD_LY)
         self.label_prompt2 = Label(self.frame_secondary, pady = PAD_LY)
         self.label_prompt3 = Label(self.frame_secondary, pady = PAD_LY)
@@ -66,16 +72,20 @@ class GUI:
         self.label_response3 = Label(self.frame_secondary, padx = PAD_LX)
 
         self.button_enter = Button(self.frame_secondary, text = "Enter",
-                                   width = 10, padx = PAD_BX, pady = PAD_BY)
-        self.button_yes = Button(self.frame_secondary, text = "Yes")
-        self.button_no = Button(self.frame_secondary, text = "No")
+                                   width = WIDTH)
+        self.button_yes = Button(self.frame_secondary, text = "Yes",
+                                 width = WIDTH, command = root.destroy)
+        self.button_draw2 = Button(self.frame_secondary, text = "Draw",
+                                  width = WIDTH, command = self.start_draw)
+        self.button_stop = Button(self.frame_secondary, text = "Stop",
+                                  width = WIDTH, command = self.stop_draw)
 
         self.entry1 = Entry(self.frame_secondary)
         self.entry2 = Entry(self.frame_secondary)
         self.entry3 = Entry(self.frame_secondary)
 
         self.frame_spiro = Frame(master)
-        self.frame_spiro.grid(row = 1, column = 0, sticky = NW)
+        self.frame_spiro.grid(row = 1, column = 0, rowspan = 2, sticky = NW)
 
         self.label_spiro = Label(self.frame_spiro, text = "Spirolaterals:")
         self.label_spiro.grid(row = 0, column = 0, padx = PAD_LX,
@@ -85,13 +95,18 @@ class GUI:
         self.label_spiros.grid(row = 1, column = 0, padx = PAD_LX,
                                sticky = NW)
 
+        self.frame_draw = Frame(master)
+
+        self.canvas = Canvas(self.frame_draw, width = 500, height = 500)
+        self.canvas.grid(row = 0, column = 0)
+
+        self.turtle = turtle.RawTurtle(self.canvas)
+        self.turtle.speed(10)
+
     def spiro_add(self):
-        self.clear()
-        if len(spiros) == MAX_SPIRO:
-            self.label_prompt1.configure(text = "You can only have {}"
-                                        + "spirolaterals.".format(MAX_SPIRO))
-            self.label_prompt1.grid(row = 0, column = 0)
-        else:
+        if self.option_stop(MAX_SPIRO, "You can only have {} spirolaterals."
+                            .format(MAX_SPIRO)) != -1:
+
             self.label_prompt1.configure(text = "Name:")
             self.label_prompt2.configure(text = "Segments:")
             self.label_prompt3.configure(text = "Angle:")
@@ -110,7 +125,7 @@ class GUI:
 
             self.button_enter.configure(command = self.check_add)
 
-            self.button_enter.grid(row = 3, column = 0, sticky = W)
+            self.button_enter.grid(row = 3, column = 0)
 
             self.entry1.delete(0, END)
             self.entry2.delete(0, END)
@@ -145,25 +160,21 @@ class GUI:
             self.label_prompt1.grid(row = 0, column = 0)
 
     def spiro_remove(self):
-        self.clear()
-        if len(spiros) == 0:
-            self.label_prompt1.configure(text = "There are no spirolaterals to"
-                                         + " remove.")
-            self.label_prompt1.grid(row = 0, column = 0)
+        if self.option_stop(0, "There are no spirolaterals to remove.") != -1:
 
-        else:
             self.label_prompt1.configure(text = "Integer:")
             self.label_prompt1.grid(row = 0, column = 0, sticky = W)
 
             self.entry1.grid(row = 0, column = 1)
 
             self.button_enter.configure(command = self.check_remove)
-            self.button_enter.grid(row = 1, column = 0, sticky = W)
+            self.button_enter.grid(row = 1, column = 0)
 
     def check_remove(self):
-        choice = check_num(self.entry1, self.label_prompt1, "That integer "
+        choice = check_num(self.entry1, self.label_response1, "That integer "
                            + "doesn't correspond to anything.", MIN_CHOICE,
                            len(spiros), int)
+
         if choice != -1:
             del spiros[choice - 1]
 
@@ -174,15 +185,44 @@ class GUI:
             self.label_prompt1.grid(row = 0, column = 0)
 
     def spiro_draw(self):
-        print(3)
+        if self.option_stop(0, "There are no spirolaterals to draw.") != -1:
+
+            self.frame_draw.grid(row = 2, column = 1, sticky = NW)
+
+            self.label_prompt1.configure(text = "Integer:")
+            self.label_prompt1.grid(row = 0, column = 0, sticky = W)
+            self.label_response1.grid(row = 0, column = 2)
+
+            self.entry1.grid(row = 0, column = 1)
+
+            self.button_draw2.grid(row = 1, column = 0)
+            self.button_stop.grid(row = 1, column = 1)
+
+    def start_draw(self):
+        choice = check_num(self.entry1, self.label_response1, "That integer "
+                           + "doesn't correspond to anything.", MIN_CHOICE,
+                           len(spiros), int)
+        self.turtle.reset()
+        self.in_motion = True
+        if choice != -1:
+            xpos, ypos = -1, -1
+            while round(xpos) != 0 and round(ypos) != 0:
+                x = 20
+                for segment in range(spiros[choice - 1].segment):
+                        self.turtle.rt(-(180 - spiros[choice - 1].angle))
+                        self.turtle.fd(x)
+                        x += 20
+                        if self.in_motion == False:
+                            return
+
+                xpos, ypos = self.turtle.pos()
+
+    def stop_draw(self):
+        self.in_motion = False
 
     def save(self):
-        self.clear()
-        if len(spiros) == 0:
-            self.label_prompt1.configure(text = "There are no spirolaterals to"
-                                         + " save.")
-            self.label_prompt1.grid(row = 0, column = 0)
-        else:
+        if self.option_stop(0, "There are no spirolaterals to save.") != -1:
+
             pickle_out = open("Spirolateral Program Save File","wb")
             pickle.dump(spiros, pickle_out)
             pickle_out.close()
@@ -192,17 +232,29 @@ class GUI:
 
     def load(self):
         global spiros
-
         self.clear()
-        pickle_in = open("Spirolateral Program Save File","rb")
-        spiros = pickle.load(pickle_in)
-        self.spiro_print()
+        try:
+            pickle_in = open("Spirolateral Program Save File","rb")
+            spiros = pickle.load(pickle_in)
+            self.spiro_print()
 
-        self.label_prompt1.configure(text = "Loaded.")
-        self.label_prompt1.grid(row = 0, column = 0)
+            self.label_prompt1.configure(text = "Loaded.")
+            self.label_prompt1.grid(row = 0, column = 0)
+
+        except:
+            self.label_prompt1.configure(text = "There's no save file to load "
+                                         + "from.\n Or the save file's "
+                                         + "contents are corrupt.")
+            self.label_prompt1.grid(row = 0, column = 0)
 
     def quit(self):
-        print(6)
+        self.clear()
+
+        self.label_prompt1.configure(text = "Are you sure you want to quit?")
+        self.label_prompt1.grid(row = 0, column = 0)
+
+        self.button_yes.grid(row = 1, column = 0)
+
 
     def spiro_print(self):
         text = ""
@@ -216,9 +268,22 @@ class GUI:
         for widget in self.frame_secondary.winfo_children():
             widget.grid_forget()
 
+        self.frame_draw.grid_forget()
+
+        self.label_response1.configure(text = "")
+        self.label_response2.configure(text = "")
+        self.label_response3.configure(text = "")
+
         self.entry1.delete(0, END)
         self.entry2.delete(0, END)
         self.entry3.delete(0, END)
+
+    def option_stop(self, num, text):
+        self.clear()
+        if len(spiros) == num:
+            self.label_prompt1.configure(text = text)
+            self.label_prompt1.grid(row = 0, column = 0)
+            return -1
 
 def check_num(entry, label, response, lower_limit, upper_limit, integer):
     try:
@@ -240,6 +305,7 @@ MAX_SPIRO = 10
 MIN_CHOICE = 1
 
 def main():
+    global root
     root = Tk()
     root.title("Spirolateral Program")
     app = GUI(root)
