@@ -101,7 +101,6 @@ class GUI:
         self.canvas.grid(row = 0, column = 0)
 
         self.turtle = turtle.RawTurtle(self.canvas)
-        self.turtle.speed(10)
 
     def spiro_add(self):
         if self.option_stop(MAX_SPIRO, "You can only have {} spirolaterals."
@@ -127,11 +126,8 @@ class GUI:
 
             self.button_enter.grid(row = 3, column = 0)
 
-            self.entry1.delete(0, END)
-            self.entry2.delete(0, END)
-            self.entry3.delete(0, END)
-
     def check_add(self):
+
         name = self.entry1.get()
         if name == "":
             self.label_response1.configure(text = "Enter a name.")
@@ -159,13 +155,22 @@ class GUI:
             self.label_prompt1.configure(text = "Spirolateral added.")
             self.label_prompt1.grid(row = 0, column = 0)
 
+        elif name != "" and self.label_response1.cget("text") != "":
+            self.label_response1.configure(text = "")
+
+        elif segment != -1 and self.label_response2.cget("text") != "":
+            self.label_response2.configure(text = "")
+
+        elif angle != -1 and self.label_response3.cget("text") != "":
+            self.label_response3.configure(text = "")
+
     def spiro_remove(self):
         if self.option_stop(0, "There are no spirolaterals to remove.") != -1:
 
             self.label_prompt1.configure(text = "Integer:")
             self.label_prompt1.grid(row = 0, column = 0, sticky = W)
 
-            self.label_response1.grid(row = 0, column = 2)
+            self.label_response1.grid(row = 0, column = 2, sticky = W)
 
             self.entry1.grid(row = 0, column = 1)
 
@@ -204,11 +209,16 @@ class GUI:
         choice = check_num(self.entry1, self.label_response1, "That integer "
                            + "doesn't correspond to anything.", MIN_CHOICE,
                            len(spiros), int)
+
+        if choice != -1 and self.label_response1.cget("text") != "":
+            self.label_response1.configure(text = "")
+
         self.turtle.reset()
+        self.turtle.speed(0)
         self.in_motion = True
         if choice != -1:
             xpos, ypos = -1, -1
-            while round(xpos) != 0 and round(ypos) != 0:
+            while round(xpos) != 0 or round(ypos) != 0:
                 x = 20
                 for segment in range(spiros[choice - 1].segment):
                         self.turtle.rt(-(180 - spiros[choice - 1].angle))
