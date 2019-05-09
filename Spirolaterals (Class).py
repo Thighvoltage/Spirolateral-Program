@@ -5,6 +5,9 @@ import pickle
 
 class Spirolateral():
     def __init__(self, name, segment, angle):
+        """A class has been made for spirolaterals so they can be easily be
+        assigned multiple variables for the program to use later.
+        """
         self.name = name
         self.segment = segment
         self.angle = angle
@@ -12,6 +15,8 @@ class Spirolateral():
 
 class GUI:
     def __init__(self, master):
+        """Defines GUI frames, widgets, turtle, and constants.
+        """
 
         COLOUR_BG = "pale green"
         PAD_LX = 20
@@ -58,9 +63,6 @@ class GUI:
         self.frame_secondary = Frame(master)
         self.frame_secondary.grid(row = 1, column = 1, sticky = NW)
 
-        # Remove free space between the list of spirolaterals
-        # and the secondary frame
-        # https://stackoverflow.com/a/26908319
         self.master.grid_columnconfigure(1, weight=1)
 
         self.label_prompt1 = Label(self.frame_secondary, pady = PAD_LY)
@@ -103,9 +105,13 @@ class GUI:
         self.turtle = turtle.RawTurtle(self.canvas)
 
     def spiro_add(self):
+        # Stops function from running when there's the max amount of spiros
+        # By putting the rest of the function indented in the if statement
         if self.option_stop(MAX_SPIRO, "You can only have {} spirolaterals."
                             .format(MAX_SPIRO)) != -1:
 
+            # Changes labels and buttons, and adds labels, entries, and buttons
+            # to the grid
             self.label_prompt1.configure(text = "Name:")
             self.label_prompt2.configure(text = "Segments:")
             self.label_prompt3.configure(text = "Angle:")
@@ -127,11 +133,13 @@ class GUI:
             self.button_enter.grid(row = 3, column = 0)
 
     def check_add(self):
-
+        """Checks that entries are valid then adds a spirolateral if they are
+        """
         name = self.entry1.get()
         if name == "":
             self.label_response1.configure(text = "Enter a name.")
 
+        # Checks for duplicate name
         for index in range(len(spiros)):
             if name == spiros[index].name:
                 self.label_response1.configure(text = "There's already a "
@@ -146,6 +154,7 @@ class GUI:
                           "Angle can't be less than 0° or greater than 360°.",
                           MIN_CHOICE, 360, int)
 
+        # Adds a spirolateral if all the entry requirements have been met
         if name != "" and segment != -1 and angle != -1:
             spiros.append(Spirolateral(name, segment, angle))
 
@@ -155,6 +164,8 @@ class GUI:
             self.label_prompt1.configure(text = "Spirolateral added.")
             self.label_prompt1.grid(row = 0, column = 0)
 
+        # Rest of function checks if entries with responses now have their
+        # Requirements met and clears the response if they have
         elif name != "" and self.label_response1.cget("text") != "":
             self.label_response1.configure(text = "")
 
@@ -178,6 +189,9 @@ class GUI:
             self.button_enter.grid(row = 1, column = 0)
 
     def check_remove(self):
+        """Checks that the entry is valid then removes the spirolateral
+        if they are
+        """
         choice = check_num(self.entry1, self.label_response1, "That integer "
                            + "doesn't correspond to anything.", MIN_CHOICE,
                            len(spiros), int)
@@ -206,6 +220,8 @@ class GUI:
             self.button_stop.grid(row = 1, column = 1)
 
     def start_draw(self):
+        """Checks that the entered integer is valid and draws the chosen spiros
+        """
         choice = check_num(self.entry1, self.label_response1, "That integer "
                            + "doesn't correspond to anything.", MIN_CHOICE,
                            len(spiros), int)
@@ -214,28 +230,39 @@ class GUI:
             self.label_response1.configure(text = "")
 
         if choice != -1:
+            # Resets turtle, increases its speed, and changes variable to let
+            # it draw
             self.turtle.reset()
             self.turtle.speed(0)
             self.in_motion = True
             xpos, ypos = -1, -1
+
+            # Continues drawing spirolateral until the turtle returns to
+            # Starting position
             while round(xpos) != 0 or round(ypos) != 0:
                 x = 20
+                # Draws the specified amount of segments per cycle before
+                # Resetting length
                 for segment in range(spiros[choice - 1].segment):
+                        # Rotates turtle by chosen angle before each segment
                         self.turtle.rt(-(180 - spiros[choice - 1].angle))
                         self.turtle.fd(x)
+                        # Increases segment length after each segment
                         x += 20
+                        # Stops drawing if in_motion is set to false
                         if self.in_motion is False:
                             return
 
                 xpos, ypos = self.turtle.pos()
             self.stop_draw()
 
-
     def stop_draw(self):
+        """Changes variable to stop the turtle from moving, lifts the pen up
+        and hides the turtle
+        """
         self.in_motion = False
         self.turtle.pu()
         self.turtle.ht()
-
 
     def save(self):
         if self.option_stop(0, "There are no spirolaterals to save.") != -1:
@@ -265,6 +292,9 @@ class GUI:
             self.label_prompt1.grid(row = 0, column = 0)
 
     def quit(self):
+        """Asks confirmation that the user wants to quit to avoid accidentally
+        exiting the program
+        """
         self.clear()
 
         self.label_prompt1.configure(text = "Are you sure you want to quit?")
@@ -281,6 +311,8 @@ class GUI:
         self.label_spiros.configure(text = text)
 
     def clear(self):
+        """Clears the secondary frame, all entries, response labels
+        """
         for widget in self.frame_secondary.winfo_children():
             widget.grid_forget()
 
@@ -295,6 +327,9 @@ class GUI:
         self.entry3.delete(0, END)
 
     def option_stop(self, num, text):
+        """At the start of add and remove functions to stop them from running
+        their code if their requirements aren't met
+        """
         self.clear()
         if len(spiros) == num:
             self.label_prompt1.configure(text = text)
@@ -303,8 +338,14 @@ class GUI:
 
 
 def check_num(entry, label, response, lower_limit, upper_limit, integer):
+    """Can be applied to any integer the user inputs to check that it's a valid
+    integer that's in range. Uses parameters so each time this function is
+    called there can be customised prompts, ranges, etc.
+    """
+    # Try and except statements test for an invalid input
     try:
         choice = integer(entry.get())
+        # Checks that the choice is in range
         if choice < lower_limit or choice > upper_limit:
             label.configure(text = response)
             return -1
@@ -317,12 +358,17 @@ def check_num(entry, label, response, lower_limit, upper_limit, integer):
             label.configure(text = "Not a valid number.")
         return -1
 
+# Creates list of spiros for the program to add to
 spiros = []
+# Creates constants for the program to use. Defining here makes it easy to
+# edit
 MAX_SPIRO = 10
 MIN_CHOICE = 1
 
 
 def main():
+    """Runs the GUI and assigns it a name
+    """
     global root
     root = Tk()
     root.title("Spirolateral Program")
@@ -330,4 +376,6 @@ def main():
     root.mainloop()
 
 if __name__ == '__main__':
+    """Runs main() if this program hasn't been imported
+    """
     main()
