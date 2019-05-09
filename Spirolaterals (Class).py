@@ -2,6 +2,7 @@ from tkinter import *
 import turtle
 import pickle
 
+
 class Spirolateral():
     def __init__(self, name, segment, angle):
         self.name = name
@@ -13,7 +14,6 @@ class GUI:
     def __init__(self, master):
 
         COLOUR_BG = "pale green"
-        COLOUR_FG = "orchid"
         PAD_LX = 20
         PAD_LY = 10
         PAD_BX = 3
@@ -76,7 +76,7 @@ class GUI:
         self.button_yes = Button(self.frame_secondary, text = "Yes",
                                  width = WIDTH, command = root.destroy)
         self.button_draw2 = Button(self.frame_secondary, text = "Draw",
-                                  width = WIDTH, command = self.start_draw)
+                                   width = WIDTH, command = self.start_draw)
         self.button_stop = Button(self.frame_secondary, text = "Stop",
                                   width = WIDTH, command = self.stop_draw)
 
@@ -213,10 +213,10 @@ class GUI:
         if choice != -1 and self.label_response1.cget("text") != "":
             self.label_response1.configure(text = "")
 
-        self.turtle.reset()
-        self.turtle.speed(0)
-        self.in_motion = True
         if choice != -1:
+            self.turtle.reset()
+            self.turtle.speed(0)
+            self.in_motion = True
             xpos, ypos = -1, -1
             while round(xpos) != 0 or round(ypos) != 0:
                 x = 20
@@ -224,18 +224,23 @@ class GUI:
                         self.turtle.rt(-(180 - spiros[choice - 1].angle))
                         self.turtle.fd(x)
                         x += 20
-                        if self.in_motion == False:
+                        if self.in_motion is False:
                             return
 
                 xpos, ypos = self.turtle.pos()
+            self.stop_draw()
+
 
     def stop_draw(self):
         self.in_motion = False
+        self.turtle.pu()
+        self.turtle.ht()
+
 
     def save(self):
         if self.option_stop(0, "There are no spirolaterals to save.") != -1:
 
-            pickle_out = open("Spirolateral Program Save File","wb")
+            pickle_out = open("Spirolateral Program Save File", "wb")
             pickle.dump(spiros, pickle_out)
             pickle_out.close()
 
@@ -246,7 +251,7 @@ class GUI:
         global spiros
         self.clear()
         try:
-            pickle_in = open("Spirolateral Program Save File","rb")
+            pickle_in = open("Spirolateral Program Save File", "rb")
             spiros = pickle.load(pickle_in)
             self.spiro_print()
 
@@ -266,7 +271,6 @@ class GUI:
         self.label_prompt1.grid(row = 0, column = 0)
 
         self.button_yes.grid(row = 1, column = 0)
-
 
     def spiro_print(self):
         text = ""
@@ -297,6 +301,7 @@ class GUI:
             self.label_prompt1.grid(row = 0, column = 0)
             return -1
 
+
 def check_num(entry, label, response, lower_limit, upper_limit, integer):
     try:
         choice = integer(entry.get())
@@ -315,6 +320,7 @@ def check_num(entry, label, response, lower_limit, upper_limit, integer):
 spiros = []
 MAX_SPIRO = 10
 MIN_CHOICE = 1
+
 
 def main():
     global root
