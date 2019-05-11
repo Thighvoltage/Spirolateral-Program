@@ -15,7 +15,7 @@ class Spirolateral():
 
 class GUI:
     def __init__(self, master):
-        """Defines GUI frames, widgets, turtle, and constants.
+        """Defines all GUI frames, widgets, turtle, and constants.
         """
 
         COLOUR_BG = "pale green"
@@ -267,6 +267,7 @@ class GUI:
     def save(self):
         if self.option_stop(0, "There are no spirolaterals to save.") != -1:
 
+            # Pickles all spirolaterals on the program to a save file
             pickle_out = open("Spirolateral Program Save File", "wb")
             pickle.dump(spiros, pickle_out)
             pickle_out.close()
@@ -277,7 +278,10 @@ class GUI:
     def load(self):
         global spiros
         self.clear()
+        # Try and except statements stop the program from crashing if there's
+        # No save file
         try:
+            # Loads safe file and changes the spiro list to what was saved
             pickle_in = open("Spirolateral Program Save File", "rb")
             spiros = pickle.load(pickle_in)
             self.spiro_print()
@@ -327,8 +331,8 @@ class GUI:
         self.entry3.delete(0, END)
 
     def option_stop(self, num, text):
-        """At the start of add and remove functions to stop them from running
-        their code if their requirements aren't met
+        """Runs at the start functions to stop them from running their code
+        if their requirements aren't met
         """
         self.clear()
         if len(spiros) == num:
