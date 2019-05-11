@@ -106,7 +106,7 @@ class GUI:
 
     def spiro_add(self):
         # Stops function from running when there's the max amount of spiros
-        # By putting the rest of the function indented in the if statement
+        # by putting the rest of the function indented in the if statement
         if self.option_stop(MAX_SPIRO, "You can only have {} spirolaterals."
                             .format(MAX_SPIRO)) != -1:
 
@@ -165,7 +165,7 @@ class GUI:
             self.label_prompt1.grid(row = 0, column = 0)
 
         # Rest of function checks if entries with responses now have their
-        # Requirements met and clears the response if they have
+        # requirements met and clears the response if they have
         elif name != "" and self.label_response1.cget("text") != "":
             self.label_response1.configure(text = "")
 
@@ -238,11 +238,11 @@ class GUI:
             xpos, ypos = -1, -1
 
             # Continues drawing spirolateral until the turtle returns to
-            # Starting position
+            # starting position
             while round(xpos) != 0 or round(ypos) != 0:
                 x = 20
                 # Draws the specified amount of segments per cycle before
-                # Resetting length
+                # resetting length
                 for segment in range(spiros[choice - 1].segment):
                         # Rotates turtle by chosen angle before each segment
                         self.turtle.rt(-(180 - spiros[choice - 1].angle))
@@ -279,7 +279,7 @@ class GUI:
         global spiros
         self.clear()
         # Try and except statements stop the program from crashing if there's
-        # No save file
+        # no save file
         try:
             # Loads safe file and changes the spiro list to what was saved
             pickle_in = open("Spirolateral Program Save File", "rb")
@@ -307,7 +307,13 @@ class GUI:
         self.button_yes.grid(row = 1, column = 0)
 
     def spiro_print(self):
+        """Creates a label with all of the spirolaterals each time a
+        spirolateral is added or removed.
+        """
         text = ""
+        # Adds to the text variable in a for loop so every spirolateral is
+        # added no matter how many there are, and any spirolateral that's been
+        # removed isn't added
         for index in range(len(spiros)):
             text += "{}) {} - {} segments and {}°\n".format(index + 1,
                     spiros[index].name, spiros[index].segment,
